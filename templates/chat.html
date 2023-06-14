@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
+        integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    Chat page for {{username}} in the room {{room}}
+    <div id="messages"></div>
+    <div id="message-input">
+        <form id="input-form">
+            <input type="text" name="message" id="message">
+            <!-- <button type="submit">Send</button> -->
+        </form>
+    </div>
+    <script>
+        // create socket object
+        let socket = io.connect("/");
+        // handle connect event
+        socket.on("connect", function () {
+            console.log(`room {{room}} connected`);
+            socket.emit("join_room", {
+                username: "{{username}}",
+                room: "{{room}}",
+            });
+        });
+        socket.on("join_room_announcement", function (data) {
+            console.log(data)
+            // console.log(data['chats']);
+            const pele = document.createElement("div")
+            data['chats'].forEach(element => {
+                let ptag = document.createElement("p")
+                ptag.innerHTML = `<b>${element['username']}<b> : ${element['message']}`
+                pele.append(ptag)
+            });
+
+            document.querySelector("#messages").innerHTML = ''
+            document.querySelector("#messages").append(pele)
+        });
+        socket.on('receive_message', function (data) {
+            console.log(data);
+            // const messageDiv = document.querySelector("#messages")
+            const newNode = document.createElement('div');
+            newNode.innerHTML = `<b>${data.username}:&nbsp;</b> ${data.message}`;
+            document.getElementById('messages').appendChild(newNode);
+        });
+        const message_input = document.querySelector("#message")
+        document.querySelector("#input-form").addEventListener("submit", (e) => {
+            e.preventDefault()
+            console.log(message_input.innerHTML)
+            let message = message_input.value.trim();
+            if (message.length) {
+                socket.emit('send_message', {
+                    username: "{{ username }}",
+                    room: "{{ room }}",
+                    message: message
+                })
+            }
+            message_input.value = '';
+            message_input.focus();
+        })
+        // handle disconnect event
+        socket.on("disconnect", function () {
+            console.log("disconnected");
+        });
+    </script>
+</body>
+
+</html>
