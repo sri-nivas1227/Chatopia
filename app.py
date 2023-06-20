@@ -16,17 +16,17 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 def hello():
     return render_template("index.html")
     # return 'hello world'
-@app.route("/chat")
-# @app.route("/chat", methods=["POST"])
+# @app.route("/chat")
+@app.route("/chat", methods=["POST"])
 def chat():
-    # data = request.json
-    # username = data['username']
-    # room = data['room']
-    username= request.args.get('username')
-    room = request.args.get('room')
+    data = request.json
+    username = data['username']
+    room = data['room']
+    # username= request.args.get('username')
+    # room = request.args.get('room')
     if username and room:
-        return render_template("chat.html", username=username, room=room)
-        # return jsonify({"status" : "success"})
+        # return render_template("chat.html", username=username, room=room)
+        return jsonify({"status" : "success"}), 200
     else:
         return jsonify({"status" : "error"})
 
@@ -37,9 +37,9 @@ def socket_connect():
     
 @socketio.on('join_room')
 def handle_join_room_event(data):
-    auth = request.headers.get('Authorization')
-    token = auth.split(' ')[1]
-    print(token)
+    # auth = request.headers.get('Authorization')
+    # token = auth.split(' ')[1]
+    # print(token)
     print(f"{data['username']} has joined the room {data['room']}")
     print(type(data))
     join_room(data['room'])
