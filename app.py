@@ -7,7 +7,9 @@ app = Flask(__name__)
 
 mongo_client = MongoClient("mongodb://localhost:27017")
 db = mongo_client['chatapp']
-chats = db['chat']
+users_collection = db['users']
+users_collection.create_index('username', unique=True)
+chats_collection = db['chat']
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app, cors_allowed_origins="*")
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -16,6 +18,21 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 def hello():
     return render_template("index.html")
     # return 'hello world'
+
+@app.route("/", methods=["POST"])
+def signin():
+    username = request.args.get('username')
+    password = request.args.get('password')
+    if username and password:
+        existing_data = users_collection.find_one({"username" : username})
+        if existing_data:
+            return render_template("select.html", username=username)
+        else:
+            users_collection.insert_one({"username" : username, "password" : password})
+            return render_template("select.html", username=username)
+    return render_template("index.html")
+        
+    
 @app.route("/chat")
 # @app.route("/chat", methods=["POST"])
 def chat():
