@@ -3,10 +3,12 @@ from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room, leave_room, send
 from pymongo import MongoClient
 from uuid import uuid4
+from util.rooms import generate_room
 app = Flask(__name__)
 
 mongo_client = MongoClient("mongodb://localhost:27017")
 db = mongo_client['chatapp']
+profile = db['profile']
 chats = db['chat']
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -14,8 +16,35 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 
 @app.route("/")
 def hello():
-    return render_template("index.html")
-    # return 'hello world'
+    # return render_template("index.html")
+    return 'hello world'
+
+@app.route("/login", methods=["POST"])
+def handle_login():
+    data = request.json
+    username = data['username']
+    password = data['password']
+    if username and password:
+        if_user = profile.find_one({"username":username})
+        if if_user:
+            if if_user['password'] == password:
+                return jsonify({"status" : "success"}), 200
+            else:
+                return jsonify({"status" : "error"}), 400
+        else:
+            profile.insert_one({"username":username,"password":password})
+            return jsonify({"status" : "success"}), 200
+        
+@app.route("/create_room", methods=["GET"])
+def create_room():
+    room_id = generate_room()
+    data = {"room_id" : room_id}
+    return jsonify(data), 200
+
+@app.route("/join_random" , methods=['GET'])
+def join_random():
+    return jsonify({"room_id" : "A1B2C3"}), 200
+
 # @app.route("/chat")
 @app.route("/chat", methods=["POST"])
 def chat():
