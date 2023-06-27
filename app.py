@@ -69,15 +69,14 @@ def handle_join_room_event(data):
     # auth = request.headers.get('Authorization')
     # token = auth.split(' ')[1]
     # print(token)
-    print(f"{data['username']} has joined the room {data['room']}")
+    print(f"{data['username']} has joined the room {data['room_id']}")
     print(type(data))
-    join_room(data['room'])
-    chats = db[data['room']].find({})
+    join_room(data['room_id'])
+    chats = db[data['room_id']].find({})
     c = []
     for chat in chats:
         print(chat)
-        c.append(chat)
-    
+        c.append(chat)    
     dat = {"chats" : c}
     
     print(type(dat))
