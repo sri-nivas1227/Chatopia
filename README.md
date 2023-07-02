@@ -1,3 +1,2 @@
 # Chatopia
-A Chaotic Chat App
-
+Made with Flask+SocketIO
