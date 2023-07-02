@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-mongo_client = MongoClient(os.getenv("MONGODB_HOST"), os.getenv("MONGODB_PORT"))
+mongo_client = MongoClient(os.getenv("MONGODB_HOST"), int(os.getenv("MONGODB_PORT")))
 db = mongo_client["chatapp"]
 profile = db["profile"]
 
@@ -27,5 +27,3 @@ def handle_login():
         else:
             profile.insert_one({"username": username, "password": password})
             return jsonify({"status": "success"}), 200
-
-
