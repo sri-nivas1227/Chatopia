@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-mongo_client = MongoClient(os.getenv("MONGODB_HOST"), int(os.getenv("MONGODB_PORT")))
+mongo_client = MongoClient(os.getenv("MONGODB_URI"))
 db = mongo_client["chatapp"]
 profile = db["profile"]
 
