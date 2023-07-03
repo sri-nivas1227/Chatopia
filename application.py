@@ -19,10 +19,10 @@ def create_app(**config_overrides):
 
     app.register_blueprint(rooms_app)
     ## chat blueprint
-    from chat.views import chat_app, socketio
+    from chat.views import chat_app
 
     app.register_blueprint(chat_app)
-    socketio.init_app(app, cors_allowed_origins="*")
+    # socketio.init_app(app, cors_allowed_origins="*")
 
     # enable CORS
     CORS(app, resources={r"/*": {"origins": "*"}})
